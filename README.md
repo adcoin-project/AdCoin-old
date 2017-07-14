@@ -15,6 +15,7 @@ AdCoin is a lite version of Bitcoin using scrypt as a proof-of-work algorithm.
  - 100000000 million total coins
  - 25 coins per block
  - Premine amount	70000000 coins (why? www.getadcoin.com)
+ - Coin abbreviation	ACC
 
 For more information, as well as an immediately useable, binary version of
 the AdCoin client sofware, see http://www.getadcoin.com.

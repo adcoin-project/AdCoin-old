@@ -1,0 +1,34 @@
+src/*.exe
+src/adcoin
+src/adcoind
+src/test_adcoin
+.*.swp
+*.*~*
+*.bak
+*.rej
+*.orig
+*.o
+*.patch
+.adcoin
+
+# Compilation and Qt preprocessor part
+*.qm
+Makefile
+adcoin-qt
+AdCoin-Qt.app
+
+# Unit-tests
+Makefile.test
+adcoin-qt_test
+
+# Resources cpp
+qrc_*.cpp
+
+# Qt creator
+*.pro.user
+
+# Mac specific
+.DS_Store
+build
+
+!src/leveldb*/Makefile

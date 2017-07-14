@@ -1,0 +1,9 @@
+Building AdCoin
+
+See doc/readme-qt.rst for instructions on building AdCoin-Qt,
+the intended-for-end-users, nice-graphical-interface, reference
+implementation of AdCoin.
+
+See doc/build-*.txt for instructions on building adcoind,
+the intended-for-services, no-graphical-interface, reference
+implementation of AdCoin.

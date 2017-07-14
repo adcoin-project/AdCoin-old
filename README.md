@@ -1,7 +1,7 @@
 AdCoin integration/staging tree
 ================================
 
-http://www.adcoin.org
+http://www.getadcoin.com
 
 Copyright (c) 2009-2014 Bitcoin Developers
 Copyright (c) 2011-2014 AdCoin Developers
@@ -10,16 +10,14 @@ What is AdCoin?
 ----------------
 
 AdCoin is a lite version of Bitcoin using scrypt as a proof-of-work algorithm.
- - 2.5 minute block targets
- - subsidy halves in 840k blocks (~4 years)
- - ~84 million total coins
-
-The rest is the same as Bitcoin.
- - 50 coins per block
- - 2016 blocks to retarget difficulty
+ - 5 minute block targets
+ - subsidy halves in 600000 blocks
+ - 100000000 million total coins
+ - 25 coins per block
+ - Premine amount	70000000 coins (why? www.getadcoin.com)
 
 For more information, as well as an immediately useable, binary version of
-the AdCoin client sofware, see http://www.adcoin.org.
+the AdCoin client sofware, see http://www.getadcoin.com.
 
 License
 -------
@@ -67,7 +65,7 @@ Unit tests for the core code are in `src/test/`. To compile and run them:
 
 Unit tests for the GUI code are in `src/qt/test/`. To compile and run them:
 
-    qmake BITCOIN_QT_TEST=1 -o Makefile.test bitcoin-qt.pro
+    qmake ADCOIN_QT_TEST=1 -o Makefile.test AdCoin-qt.pro
     make -f Makefile.test
     ./adcoin-qt_test
 

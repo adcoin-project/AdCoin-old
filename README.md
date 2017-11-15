@@ -3,8 +3,8 @@ AdCoin integration/staging tree
 
 http://www.getadcoin.com
 
-Copyright (c) 2009-2014 Bitcoin Developers
-Copyright (c) 2011-2014 AdCoin Developers
+Copyright (c) 2009-2017 Bitcoin Developers
+Copyright (c) 2011-2017 AdCoin Developers
 
 What is AdCoin?
 ----------------

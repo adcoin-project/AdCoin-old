@@ -1,0 +1,6 @@
+#!/bin/sh
+while :
+do
+  /opt/litecoin/litecoin-cli -rpcport=2300 sendtoaddress mvbnrCX3bg1cDRUu8pkecrvP6vQkSLDSou 0.1
+	sleep 10
+done

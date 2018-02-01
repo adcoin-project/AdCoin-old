@@ -1,0 +1,8 @@
+#!/bin/bash
+mkdir -p /var/log/acc
+cd /var/log/acc && python -m SimpleHTTPServer 3993 &
+while true;
+do
+  litecoin-cli -regtest getinfo > /var/log/acc/getinfo.txt
+  sleep 5
+done

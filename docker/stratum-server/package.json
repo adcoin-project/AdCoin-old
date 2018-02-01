@@ -1,0 +1,42 @@
+{
+    "name": "merged-pool",
+    "version": "0.1.10",
+    "description": "High performance Stratum poolserver in Node.js for merged mining",
+    "keywords": [
+        "stratum",
+	    "merged",
+        "mining",
+        "pool",
+        "server",
+        "poolserver",
+        "bitcoin",
+        "litecoin",
+        "scrypt"
+    ],
+    "homepage": "https://github.com/KillerByte/node-merged-pool",
+    "bugs": {
+        "url": "https://github.com/KillerByte/node-merged-pool/issues"
+    },
+    "license": "GPL-2.0",
+    "author": "Daniel Beal",
+    "contributors": [
+	    "zone117x",
+        "vekexasia",
+        "TheSeven"
+    ],
+    "main": "lib/index.js",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/KillerByte/node-merged-pool.git"
+    },
+    "dependencies": {
+        "unomp-multi-hashing": "*",
+        "bignum": "*",
+        "base58-native": "*",
+        "async": "*",
+        "redis": "*"
+    },
+    "engines": {
+        "node": ">=0.10"
+    }
+}

@@ -1,0 +1,29 @@
+#!/bin/bash
+
+echo "Running litecoind 1..."
+/opt/litecoin/litecoind -rpcport=2300 -port=19335 -addnode=localhost:19336 &
+sleep 3
+
+echo "Running HTTP Debug proxy"
+. /root/.nvm/nvm.sh && node /opt/http-proxy/main.js http://localhost:2300 2400 &> /logs/rpc_debug.log &
+
+blocks_made="/var/blocks_made"
+if [ ! -f "$blocks_made" ]
+then
+  # /opt/litecoin/litecoin-cli -rpcport=2300 getinfo
+  echo "Generate 1 block (will take about 10 mins)!"
+  /opt/litecoin/litecoin-cli -rpcport=2300 generate 1
+  touch $blocks_made
+  sleep 3
+fi
+
+echo "Running litecoind 2..."
+/opt/litecoin/litecoind -rpcport=2301 -port=19336 -addnode=localhost:19335 -datadir=/root/.adcoin/regtest2 &
+sleep 3
+
+# echo "Running spendbot..."
+# /usr/bin/spendbot &
+
+echo "Running Stratum pool.."
+. /root/.nvm/nvm.sh && node /opt/stratum-server/main.js &
+bash /usr/bin/store_log_info

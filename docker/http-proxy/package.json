@@ -1,0 +1,15 @@
+{
+  "name": "http-proxy",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "console-stamp": "^0.2.6",
+    "http-forward": "^0.1.3"
+  }
+}

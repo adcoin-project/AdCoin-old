@@ -8,14 +8,23 @@ https://adcoin.org
 What is AdCoin?
 ----------------
 
-AdCoin is an experimental digital currency that enables instant payments to
+AdCoin is an digital currency that enables instant payments to
 anyone, anywhere in the world. AdCoin uses peer-to-peer technology to operate
 with no central authority: managing transactions and issuing money are carried
 out collectively by the network. AdCoin is the name of open source
 software which enables the use of this currency.
 
+Summary of AdCoin:
+  - 100000000 million total coins
+   - 25 coins per block
+   - Premine amount	70000000 coins (why? [https://www.getadcoin.com](https://www.getadcoin.com))
+ + - Coin abbreviation	ACC
+  
+  For more information, as well as an immediately useable, binary version of
+  the AdCoin client sofware, see http://www.getadcoin.com.
+
 For more information, as well as an immediately useable, binary version of
-the AdCoin software, see [https://adcoin.org](https://adcoin.org).
+the AdCoin software, see [https://www.getadcoin.com](https://www.getadcoin.com).
 
 License
 -------

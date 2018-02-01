@@ -3,7 +3,7 @@ AdCoin integration/staging tree
 
 [![Build Status](https://travis-ci.org/adcoin-project/adcoin.svg?branch=master)](https://travis-ci.org/adcoin-project/adcoin)
 
-https://adcoin.org
+[https://www.getadcoin.com](https://www.getadcoin.com)
 
 What is AdCoin?
 ----------------

@@ -40,8 +40,6 @@ src/config/stamp-h1
 share/setup.nsi
 share/qt/Info.plist
 
-src/univalue/gen
-
 src/qt/*.moc
 src/qt/moc_*.cpp
 src/qt/forms/ui_*.h
@@ -59,7 +57,6 @@ src/qt/test/moc*.cpp
 *.pyc
 *.o
 *.o-*
-*.patch
 *.a
 *.pb.cc
 *.pb.h
@@ -97,7 +94,7 @@ build
 *.gcno
 *.gcda
 /*.info
-test_litecoin.coverage/
+test_adcoin.coverage/
 total.coverage/
 coverage_percent.txt
 
@@ -109,6 +106,10 @@ qa/pull-tester/tests_config.py
 qa/cache/*
 
 !src/leveldb*/Makefile
+!depends/Makefile
+!src/qt/Makefile
+!src/qt/test/Makefile
+!src/test/Makefile
 
 /doc/doxygen/
 

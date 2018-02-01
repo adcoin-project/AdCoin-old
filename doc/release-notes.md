@@ -1,123 +1,102 @@
-0.8.7.5 changes
-=============
-- openssl-1.0.1k or older versions patched for CVE-2014-8275 broke compatibility with Bitcoin and AdCoin.
-  This update patches AdCoin to maintain compatibility with CVE-2014-8275 patched openssl.
-- If you are running v0.8.7.4 as distributed by adcoin.org you do not need to upgrade.
-  The binaries distributed on adcoin.org contain their own copy of openssl so they are unaffected by this issue.
+Bitcoin Core version 0.14.2 is now available from:
 
-0.8.7.4 changes
-=============
-- Enforce v2 blocks at height 710000 on mainnet, 400000 on testnet
-- Add `-maxorphantx=<n>` and `-maxorphanblocks=<n>` options for control over the maximum orphan transactions and blocks
-- Stricter memory limits on CNode
-- Upgrade OpenSSL to 1.0.1i (see https://www.openssl.org/news/secadv_20140806.txt - just to be sure, no critical issues
+  <https://bitcoin.org/bin/bitcoin-core-0.14.2/>
 
-0.8.7.2 changes
-=============
-- Mac and Windows Official Gitian Builds: upgrade to openssl-1.0.1h for CVE-2014-0224
-                   Linux Gitian build uses Lucid 0.9.8k-7ubuntu8.18
+This is a new minor version release, including various bugfixes and
+performance improvements, as well as updated translations.
 
-0.8.7.1 changes
-=============
-- Mac and Windows Official Gitian Builds: upgrade to openssl-1.0.1g for CVE-2014-0160
-                   Linux was not vulnerable with Lucid openssl-0.9.8k
-                   Older versions were only vulnerable with rarely used RPC SSL
-- If you build from source, be sure that your openssl is patched for CVE-2014-0160.
-- Upgrade openssl, qt, miniupnpc, zlib, libpng, qrencode
-- Many bug fixes from Bitcoin 0.8.7rc stable branch
-    including transaction malleability mitigation backports from 0.9
-- Add testnet checkpoints
-- Add new testnet seed
+Please report bugs using the issue tracker at github:
 
-0.8.6.2 changes
-=============
+  <https://github.com/bitcoin/bitcoin/issues>
 
-- Windows only: Fixes issue where network connectivity can fail.
+To receive security and update notifications, please subscribe to:
 
-- Cleanup of SSE2 scrypt detection.
+  <https://bitcoincore.org/en/list/announcements/join/>
 
-- Minor fixes:
-  - s/Bitcoin/AdCoin/ in the Coin Control example
-  - Fix custom build on MacOS X 10.9
-  - Fix QT5 custom build
-  - Update Debian build instructions
-  - Update Homebrew build 
+Compatibility
+==============
 
-0.8.6.1 changes
-=============
+Bitcoin Core is extensively tested on multiple operating systems using
+the Linux kernel, macOS 10.8+, and Windows Vista and later.
 
-- Coin Control - experts only GUI selection of inputs before you send a transaction
+Microsoft ended support for Windows XP on [April 8th, 2014](https://www.microsoft.com/en-us/WindowsForBusiness/end-of-xp-support),
+No attempt is made to prevent installing or running the software on Windows XP, you
+can still do so at your own risk but be aware that there are known instabilities and issues.
+Please do not report issues about Windows XP to the issue tracker.
 
-- Disable Wallet - reduces memory requirements, helpful for miner or relay nodes
+Bitcoin Core should also work on most other Unix-like systems but is not
+frequently tested on them.
 
-- 20x reduction in default mintxfee.
-
-- Up to 50% faster PoW validation, faster sync and reindexing.
-
-- Peers older than protocol version 70002 are disconnected.  0.8.3.7 is the oldest compatible client.
-
-- Internal miner added back to AdCoin.  setgenerate now works, although it is generally a bad idea as it is significantly slower than external CPU miners.
-
-- New RPC commands: getbestblockhash and verifychain
-
-- Improve fairness of the high priority transaction space per block
-
-- OSX block chain database corruption fixes
-  - Update leveldb to 1.13
-  - Use fcntl with `F_FULLSYNC` instead of fsync on OSX
-  - Use native Darwin memory barriers
-  - Replace use of mmap in leveldb for improved reliability (only on OSX)
-
-- Fix nodes forwarding transactions with empty vins and getting banned
-
-- Network code performance and robustness improvements
-
-- Additional debug.log logging for diagnosis of network problems, log timestamps by default
-
-- Fix rare GUI crash on send
-
-0.8.5.1 changes
+Notable changes
 ===============
 
-Workaround negative version numbers serialization bug.
+miniupnp CVE-2017-8798
+----------------------------
 
-Fix out-of-bounds check (AdCoin currently does not use this codepath, but we apply this
-patch just to match Bitcoin 0.8.5.)
+Bundled miniupnpc was updated to 2.0.20170509. This fixes an integer signedness error
+(present in MiniUPnPc v1.4.20101221 through v2.0) that allows remote attackers
+(within the LAN) to cause a denial of service or possibly have unspecified
+other impact.
 
-0.8.4.1 changes
-===============
+This only affects users that have explicitly enabled UPnP through the GUI
+setting or through the `-upnp` option, as since the last UPnP vulnerability
+(in Bitcoin Core 0.10.3) it has been disabled by default.
 
-CVE-2013-5700 Bloom: filter crash issue - AdCoin 0.8.3.7 disabled bloom by default so was 
-unaffected by this issue, but we include their patches anyway just in case folks want to 
-enable bloomfilter=1.
+If you use this option, it is recommended to upgrade to this version as soon as
+possible.
 
-CVE-2013-4165: RPC password timing guess vulnerability
+Known Bugs
+==========
 
-CVE-2013-4627: Better fix for the fill-memory-with-orphaned-tx attack
+Since 0.14.0 the approximate transaction fee shown in Bitcoin-Qt when using coin
+control and smart fee estimation does not reflect any change in target from the
+smart fee slider. It will only present an approximate fee calculated using the
+default target. The fee calculated using the correct target is still applied to
+the transaction and shown in the final send confirmation dialog.
 
-Fix multi-block reorg transaction resurrection.
+0.14.2 Change log
+=================
 
-Fix non-standard disconnected transactions causing mempool orphans.  This bug could cause 
-nodes running with the -debug flag to crash, although it was lot less likely on AdCoin 
-as we disabled IsDust() in 0.8.3.x.
+Detailed release notes follow. This overview includes changes that affect
+behavior, not code moves, refactors and string updates. For convenience in locating
+the code changes and accompanying discussion, both the pull request and
+git merge commit are mentioned.
 
-Mac OSX: use 'FD_FULLSYNC' with LevelDB, which will (hopefully!) prevent the database 
-corruption issues have experienced on OSX.
+### RPC and other APIs
+- #10410 `321419b` Fix importwallet edge case rescan bug (ryanofsky)
 
-Add height parameter to getnetworkhashps.
+### P2P protocol and network code
+- #10424 `37a8fc5` Populate services in GetLocalAddress (morcos)
+- #10441 `9e3ad50` Only enforce expected services for half of outgoing connections (theuni)
 
-Fix Norwegian and Swedish translations.
+### Build system
+- #10414 `ffb0c4b` miniupnpc 2.0.20170509 (fanquake)
+- #10228 `ae479bc` Regenerate bitcoin-config.h as necessary (theuni)
 
-Minor efficiency improvement in block peer request handling.
+### Miscellaneous
+- #10245 `44a17f2` Minor fix in build documentation for FreeBSD 11 (shigeya)
+- #10215 `0aee4a1` Check interruptNet during dnsseed lookups (TheBlueMatt)
 
+### GUI
+- #10231 `1e936d7` Reduce a significant cs_main lock freeze (jonasschnelli)
 
-0.8.3.7 changes
-===============
+### Wallet
+- #10294 `1847642` Unset change position when there is no change (instagibbs)
 
-Fix CVE-2013-4627 denial of service, a memory exhaustion attack that could crash low-memory nodes.
+Credits
+=======
 
-Fix a regression that caused excessive writing of the peers.dat file.
+Thanks to everyone who directly contributed to this release:
 
-Add option for bloom filtering.
+- Alex Morcos
+- Cory Fields
+- fanquake
+- Gregory Sanders
+- Jonas Schnelli
+- Matt Corallo
+- Russell Yanofsky
+- Shigeya Suzuki
+- Wladimir J. van der Laan
 
-Fix Hebrew translation.
+As well as everyone that helped translating on [Transifex](https://www.transifex.com/projects/p/bitcoin/).
+

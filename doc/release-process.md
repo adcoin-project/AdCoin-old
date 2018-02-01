@@ -1,122 +1,267 @@
 Release Process
 ====================
 
-* * *
+Before every release candidate:
 
-###update (commit) version in sources
+* Update translations (ping wumpus on IRC) see [translation_process.md](https://github.com/bitcoin/bitcoin/blob/master/doc/translation_process.md#synchronising-translations).
 
+* Update manpages, see [gen-manpages.sh](https://github.com/adcoin-project/adcoin/blob/master/contrib/devtools/README.md#gen-manpagessh).
 
-	bitcoin-qt.pro
-	contrib/verifysfbinaries/verify.sh
-	doc/README*
-	share/setup.nsi
-	src/clientversion.h (change CLIENT_VERSION_IS_RELEASE to true)
+Before every minor and major release:
 
-###tag version in git
+* Update [bips.md](bips.md) to account for changes since the last release.
+* Update version in sources (see below)
+* Write release notes (see below)
+* Update `src/chainparams.cpp` nMinimumChainWork with information from the getblockchaininfo rpc.
+* Update `src/chainparams.cpp` defaultAssumeValid  with information from the getblockhash rpc.
+  - The selected value must not be orphaned so it may be useful to set the value two blocks back from the tip.
+  - Testnet should be set some tens of thousands back from the tip due to reorgs there.
+  - This update should be reviewed with a reindex-chainstate with assumevalid=0 to catch any defect
+     that causes rejection of blocks in the past history.
 
-	git tag -s v0.8.7
+Before every major release:
 
-###write release notes. git shortlog helps a lot, for example:
+* Update hardcoded [seeds](/contrib/seeds/README.md), see [this pull request](https://github.com/bitcoin/bitcoin/pull/7415) for an example.
+* Update [`BLOCK_CHAIN_SIZE`](/src/qt/intro.cpp) to the current size plus some overhead.
 
-	git shortlog --no-merges v0.7.2..v0.8.0
+### First time / New builders
 
-* * *
+If you're using the automated script (found in [contrib/gitian-build.sh](/contrib/gitian-build.sh)), then at this point you should run it with the "--setup" command. Otherwise ignore this.
 
-##perform gitian builds
+Check out the source code in the following directory hierarchy.
 
- From a directory containing the adcoin source, gitian-builder and gitian.sigs
-  
-	export SIGNER=(your gitian key, ie bluematt, sipa, etc)
-	export VERSION=0.8.7
-	cd ./gitian-builder
+    cd /path/to/your/toplevel/build
+    git clone https://github.com/adcoin-project/gitian.sigs.ltc.git
+    git clone https://github.com/adcoin-project/adcoin-detached-sigs.git
+    git clone https://github.com/devrandom/gitian-builder.git
+    git clone https://github.com/adcoin-project/adcoin.git
 
- Fetch and build inputs: (first time, or when dependency versions change)
+### AdCoin maintainers/release engineers, update version in sources
 
-	mkdir -p inputs; cd inputs/
-	wget 'http://miniupnp.free.fr/files/download.php?file=miniupnpc-1.9.20140401.tar.gz' -O miniupnpc-1.9.20140401.tar.gz'
-	wget 'https://www.openssl.org/source/openssl-1.0.1k.tar.gz'
-	wget 'http://download.oracle.com/berkeley-db/db-4.8.30.NC.tar.gz'
-	wget 'http://zlib.net/zlib-1.2.8.tar.gz'
-	wget 'ftp://ftp.simplesystems.org/pub/libpng/png/src/history/libpng16/libpng-1.6.8.tar.gz'
-	wget 'http://fukuchi.org/works/qrencode/qrencode-3.4.3.tar.bz2'
-	wget 'http://downloads.sourceforge.net/project/boost/boost/1.55.0/boost_1_55_0.tar.bz2'
-	wget 'http://download.qt-project.org/official_releases/qt/4.8/4.8.5/qt-everywhere-opensource-src-4.8.5.tar.gz'
-	cd ..
-	./bin/gbuild ../adcoin/contrib/gitian-descriptors/boost-win32.yml
-	mv build/out/boost-*.zip inputs/
-	./bin/gbuild ../adcoin/contrib/gitian-descriptors/deps-win32.yml
-	mv build/out/bitcoin*.zip inputs/
-	./bin/gbuild ../adcoin/contrib/gitian-descriptors/qt-win32.yml
-	mv build/out/qt*.zip inputs/
+Update the following:
 
- Build adcoind and adcoin-qt on Linux32, Linux64, and Win32:
-  
-	./bin/gbuild --commit adcoin=v${VERSION} ../adcoin/contrib/gitian-descriptors/gitian.yml
-	./bin/gsign --signer $SIGNER --release ${VERSION} --destination ../gitian.sigs/ ../adcoin/contrib/gitian-descriptors/gitian.yml
-	pushd build/out
-	zip -r adcoin-${VERSION}-linux.zip *
-	mv adcoin-${VERSION}-linux.zip ../../
-	popd
-	./bin/gbuild --commit adcoin=v${VERSION} ../adcoin/contrib/gitian-descriptors/gitian-win32.yml
-	./bin/gsign --signer $SIGNER --release ${VERSION}-win32 --destination ../gitian.sigs/ ../adcoin/contrib/gitian-descriptors/gitian-win32.yml
-	pushd build/out
-	zip -r adcoin-${VERSION}-win32.zip *
-	mv adcoin-${VERSION}-win32.zip ../../
-	popd
+- `configure.ac`:
+    - `_CLIENT_VERSION_MAJOR`
+    - `_CLIENT_VERSION_MINOR`
+    - `_CLIENT_VERSION_REVISION`
+    - Don't forget to set `_CLIENT_VERSION_IS_RELEASE` to `true`
+- `src/clientversion.h`: (this mirrors `configure.ac` - see issue #3539)
+    - `CLIENT_VERSION_MAJOR`
+    - `CLIENT_VERSION_MINOR`
+    - `CLIENT_VERSION_REVISION`
+    - Don't forget to set `CLIENT_VERSION_IS_RELEASE` to `true`
+- `doc/README.md` and `doc/README_windows.txt`
+- `doc/Doxyfile`: `PROJECT_NUMBER` contains the full version
+- `contrib/gitian-descriptors/*.yml`: usually one'd want to do this on master after branching off the release - but be sure to at least do it before a new major release
 
-  Build output expected:
+Write release notes. git shortlog helps a lot, for example:
 
-  1. linux 32-bit and 64-bit binaries + source (adcoin-${VERSION}-linux-gitian.zip)
-  2. windows 32-bit binary, installer + source (adcoin-${VERSION}-win32-gitian.zip)
-  3. Gitian signatures (in gitian.sigs/${VERSION}[-win32]/(your gitian key)/
+    git shortlog --no-merges v(current version, e.g. 0.7.2)..v(new version, e.g. 0.8.0)
 
-repackage gitian builds for release as stand-alone zip/tar/installer exe
+(or ping @wumpus on IRC, he has specific tooling to generate the list of merged pulls
+and sort them into categories based on labels)
 
-**Linux .tar.gz:**
+Generate list of authors:
 
-	unzip adcoin-${VERSION}-linux-gitian.zip -d adcoin-${VERSION}-linux
-	tar czvf adcoin-${VERSION}-linux.tar.gz adcoin-${VERSION}-linux
-	rm -rf adcoin-${VERSION}-linux
+    git log --format='%aN' "$*" | sort -ui | sed -e 's/^/- /'
 
-**Windows .zip and setup.exe:**
+Tag version (or release candidate) in git
 
-	unzip adcoin-${VERSION}-win32-gitian.zip -d adcoin-${VERSION}-win32
-	mv adcoin-${VERSION}-win32/adcoin-*-setup.exe .
-	zip -r adcoin-${VERSION}-win32.zip bitcoin-${VERSION}-win32
-	rm -rf adcoin-${VERSION}-win32
+    git tag -s v(new version, e.g. 0.8.0)
 
-**Perform Mac build:**
+### Setup and perform Gitian builds
 
-  OSX binaries are created on a dedicated 32-bit, OSX 10.6.8 machine.
-  AdCoin 0.8.x is built with MacPorts.  0.9.x will be Homebrew only.
+If you're using the automated script (found in [contrib/gitian-build.sh](/contrib/gitian-build.sh)), then at this point you should run it with the "--build" command. Otherwise ignore this.
 
-	qmake RELEASE=1 USE_UPNP=1 USE_QRCODE=1
-	make
-	export QTDIR=/opt/local/share/qt4  # needed to find translations/qt_*.qm files
-	T=$(contrib/qt_translations.py $QTDIR/translations src/qt/locale)
-	python2.7 share/qt/clean_mac_info_plist.py
-	python2.7 contrib/macdeploy/macdeployqtplus AdCoin-Qt.app -add-qt-tr $T -dmg -fancy contrib/macdeploy/fancy.plist
+Setup Gitian descriptors:
 
- Build output expected: AdCoin-Qt.dmg
+    pushd ./adcoin
+    export SIGNER=(your Gitian key, ie bluematt, sipa, etc)
+    export VERSION=(new version, e.g. 0.8.0)
+    git fetch
+    git checkout v${VERSION}
+    popd
 
-###Next steps:
+Ensure your gitian.sigs.ltc are up-to-date if you wish to gverify your builds against other Gitian signatures.
 
-* Code-sign Windows -setup.exe (in a Windows virtual machine) and
-  OSX Bitcoin-Qt.app (Note: only Gavin has the code-signing keys currently)
+    pushd ./gitian.sigs.ltc
+    git pull
+    popd
 
-* update adcoin.org version
-  make sure all OS download links go to the right versions
+Ensure gitian-builder is up-to-date:
 
-* update forum version
+    pushd ./gitian-builder
+    git pull
+    popd
 
-* update wiki download links
+### Fetch and create inputs: (first time, or when dependency versions change)
 
-Commit your signature to gitian.sigs:
+    pushd ./gitian-builder
+    mkdir -p inputs
+    wget -P inputs https://bitcoincore.org/cfields/osslsigncode-Backports-to-1.7.1.patch
+    wget -P inputs http://downloads.sourceforge.net/project/osslsigncode/osslsigncode/osslsigncode-1.7.1.tar.gz
+    popd
 
-	pushd gitian.sigs
-	git add ${VERSION}/${SIGNER}
-	git add ${VERSION}-win32/${SIGNER}
-	git commit -a
-	git push  # Assuming you can push to the gitian.sigs tree
-	popd
+Create the OS X SDK tarball, see the [OS X readme](README_osx.md) for details, and copy it into the inputs directory.
 
+### Optional: Seed the Gitian sources cache and offline git repositories
+
+By default, Gitian will fetch source files as needed. To cache them ahead of time:
+
+    pushd ./gitian-builder
+    make -C ../adcoin/depends download SOURCES_PATH=`pwd`/cache/common
+    popd
+
+Only missing files will be fetched, so this is safe to re-run for each build.
+
+NOTE: Offline builds must use the --url flag to ensure Gitian fetches only from local URLs. For example:
+
+    pushd ./gitian-builder
+    ./bin/gbuild --url adcoin=/path/to/adcoin,signature=/path/to/sigs {rest of arguments}
+    popd
+
+The gbuild invocations below <b>DO NOT DO THIS</b> by default.
+
+### Build and sign AdCoin for Linux, Windows, and OS X:
+
+    pushd ./gitian-builder
+    ./bin/gbuild --memory 3000 --commit adcoin=v${VERSION} ../adcoin/contrib/gitian-descriptors/gitian-linux.yml
+    ./bin/gsign --signer $SIGNER --release ${VERSION}-linux --destination ../gitian.sigs.ltc/ ../adcoin/contrib/gitian-descriptors/gitian-linux.yml
+    mv build/out/adcoin-*.tar.gz build/out/src/adcoin-*.tar.gz ../
+
+    ./bin/gbuild --memory 3000 --commit adcoin=v${VERSION} ../adcoin/contrib/gitian-descriptors/gitian-win.yml
+    ./bin/gsign --signer $SIGNER --release ${VERSION}-win-unsigned --destination ../gitian.sigs.ltc/ ../adcoin/contrib/gitian-descriptors/gitian-win.yml
+    mv build/out/adcoin-*-win-unsigned.tar.gz inputs/adcoin-win-unsigned.tar.gz
+    mv build/out/adcoin-*.zip build/out/adcoin-*.exe ../
+
+    ./bin/gbuild --memory 3000 --commit adcoin=v${VERSION} ../adcoin/contrib/gitian-descriptors/gitian-osx.yml
+    ./bin/gsign --signer $SIGNER --release ${VERSION}-osx-unsigned --destination ../gitian.sigs.ltc/ ../adcoin/contrib/gitian-descriptors/gitian-osx.yml
+    mv build/out/adcoin-*-osx-unsigned.tar.gz inputs/adcoin-osx-unsigned.tar.gz
+    mv build/out/adcoin-*.tar.gz build/out/adcoin-*.dmg ../
+    popd
+
+Build output expected:
+
+  1. source tarball (`adcoin-${VERSION}.tar.gz`)
+  2. linux 32-bit and 64-bit dist tarballs (`adcoin-${VERSION}-linux[32|64].tar.gz`)
+  3. windows 32-bit and 64-bit unsigned installers and dist zips (`adcoin-${VERSION}-win[32|64]-setup-unsigned.exe`, `adcoin-${VERSION}-win[32|64].zip`)
+  4. OS X unsigned installer and dist tarball (`adcoin-${VERSION}-osx-unsigned.dmg`, `adcoin-${VERSION}-osx64.tar.gz`)
+  5. Gitian signatures (in `gitian.sigs.ltc/${VERSION}-<linux|{win,osx}-unsigned>/(your Gitian key)/`)
+
+### Verify other gitian builders signatures to your own. (Optional)
+
+Add other gitian builders keys to your gpg keyring, and/or refresh keys.
+
+    gpg --import adcoin/contrib/gitian-keys/*.pgp
+    gpg --refresh-keys
+
+Verify the signatures
+
+    pushd ./gitian-builder
+    ./bin/gverify -v -d ../gitian.sigs.ltc/ -r ${VERSION}-linux ../adcoin/contrib/gitian-descriptors/gitian-linux.yml
+    ./bin/gverify -v -d ../gitian.sigs.ltc/ -r ${VERSION}-win-unsigned ../adcoin/contrib/gitian-descriptors/gitian-win.yml
+    ./bin/gverify -v -d ../gitian.sigs.ltc/ -r ${VERSION}-osx-unsigned ../adcoin/contrib/gitian-descriptors/gitian-osx.yml
+    popd
+
+### Next steps:
+
+Commit your signature to gitian.sigs.ltc:
+
+    pushd gitian.sigs.ltc
+    git add ${VERSION}-linux/${SIGNER}
+    git add ${VERSION}-win-unsigned/${SIGNER}
+    git add ${VERSION}-osx-unsigned/${SIGNER}
+    git commit -a
+    git push  # Assuming you can push to the gitian.sigs.ltc tree
+    popd
+
+Wait for Windows/OS X detached signatures:
+
+- Once the Windows/OS X builds each have 3 matching signatures, they will be signed with their respective release keys.
+- Detached signatures will then be committed to the [adcoin-detached-sigs](https://github.com/adcoin-project/adcoin-detached-sigs) repository, which can be combined with the unsigned apps to create signed binaries.
+
+Create (and optionally verify) the signed OS X binary:
+
+    pushd ./gitian-builder
+    ./bin/gbuild -i --commit signature=v${VERSION} ../adcoin/contrib/gitian-descriptors/gitian-osx-signer.yml
+    ./bin/gsign --signer $SIGNER --release ${VERSION}-osx-signed --destination ../gitian.sigs.ltc/ ../adcoin/contrib/gitian-descriptors/gitian-osx-signer.yml
+    ./bin/gverify -v -d ../gitian.sigs.ltc/ -r ${VERSION}-osx-signed ../adcoin/contrib/gitian-descriptors/gitian-osx-signer.yml
+    mv build/out/adcoin-osx-signed.dmg ../adcoin-${VERSION}-osx.dmg
+    popd
+
+Create (and optionally verify) the signed Windows binaries:
+
+    pushd ./gitian-builder
+    ./bin/gbuild -i --commit signature=v${VERSION} ../adcoin/contrib/gitian-descriptors/gitian-win-signer.yml
+    ./bin/gsign --signer $SIGNER --release ${VERSION}-win-signed --destination ../gitian.sigs.ltc/ ../adcoin/contrib/gitian-descriptors/gitian-win-signer.yml
+    ./bin/gverify -v -d ../gitian.sigs.ltc/ -r ${VERSION}-win-signed ../adcoin/contrib/gitian-descriptors/gitian-win-signer.yml
+    mv build/out/adcoin-*win64-setup.exe ../adcoin-${VERSION}-win64-setup.exe
+    mv build/out/adcoin-*win32-setup.exe ../adcoin-${VERSION}-win32-setup.exe
+    popd
+
+Commit your signature for the signed OS X/Windows binaries:
+
+    pushd gitian.sigs.ltc
+    git add ${VERSION}-osx-signed/${SIGNER}
+    git add ${VERSION}-win-signed/${SIGNER}
+    git commit -a
+    git push  # Assuming you can push to the gitian.sigs.ltc tree
+    popd
+
+### After 3 or more people have gitian-built and their results match:
+
+- Create `SHA256SUMS.asc` for the builds, and GPG-sign it:
+
+```bash
+sha256sum * > SHA256SUMS
+```
+
+The list of files should be:
+```
+adcoin-${VERSION}-aarch64-linux-gnu.tar.gz
+adcoin-${VERSION}-arm-linux-gnueabihf.tar.gz
+adcoin-${VERSION}-i686-pc-linux-gnu.tar.gz
+adcoin-${VERSION}-x86_64-linux-gnu.tar.gz
+adcoin-${VERSION}-osx64.tar.gz
+adcoin-${VERSION}-osx.dmg
+adcoin-${VERSION}.tar.gz
+adcoin-${VERSION}-win32-setup.exe
+adcoin-${VERSION}-win32.zip
+adcoin-${VERSION}-win64-setup.exe
+adcoin-${VERSION}-win64.zip
+```
+The `*-debug*` files generated by the gitian build contain debug symbols
+for troubleshooting by developers. It is assumed that anyone that is interested
+in debugging can run gitian to generate the files for themselves. To avoid
+end-user confusion about which file to pick, as well as save storage
+space *do not upload these to the adcoin.org server, nor put them in the torrent*.
+
+- GPG-sign it, delete the unsigned file:
+```
+gpg --digest-algo sha256 --clearsign SHA256SUMS # outputs SHA256SUMS.asc
+rm SHA256SUMS
+```
+(the digest algorithm is forced to sha256 to avoid confusion of the `Hash:` header that GPG adds with the SHA256 used for the files)
+Note: check that SHA256SUMS itself doesn't end up in SHA256SUMS, which is a spurious/nonsensical entry.
+
+- Upload zips and installers, as well as `SHA256SUMS.asc` from last step, to the adcoin.org server.
+
+```
+
+- Update adcoin.org version
+
+- Announce the release:
+
+  - adcoin-dev and adcoin-dev mailing list
+
+  - blog.adcoin.org blog post
+
+  - Update title of #adcoin and #adcoin-dev on Freenode IRC
+
+  - Optionally twitter, reddit /r/AdCoin, ... but this will usually sort out itself
+
+  - Archive release notes for the new version to `doc/release-notes/` (branch `master` and branch of the release)
+
+  - Create a [new GitHub release](https://github.com/adcoin-project/adcoin/releases/new) with a link to the archived release notes.
+
+  - Celebrate

@@ -5,7 +5,7 @@ Setup
 ---------------------
 AdCoin is the original AdCoin client and it builds the backbone of the network. However, it downloads and stores the entire history of AdCoin transactions (which is currently several GBs); depending on the speed of your computer and network connection, the synchronization process can take anywhere from a few hours to a day or more.
 
-To download AdCoin, visit [adcoin.org](https://adcoin.org).
+To download AdCoin, visit [getadcoin.com](https://www.getadcoin.com).
 
 Running
 ---------------------
@@ -28,10 +28,9 @@ Drag AdCoin-Core to your applications folder, and then run AdCoin-Core.
 
 ### Need Help?
 
-* See the documentation at the [AdCoin Wiki](https://adcoin.info/)
+* See the documentation at the [AdCoin Wiki](https://www.getadcoin.com/)
 for help and more information.
-* Ask for help on [#adcoin](http://webchat.freenode.net?channels=adcoin) on Freenode. If you don't have an IRC client use [webchat here](http://webchat.freenode.net?channels=adcoin).
-* Ask for help on the [AdCoinTalk](https://adcointalk.io/) forums.
+
 
 Building
 ---------------------

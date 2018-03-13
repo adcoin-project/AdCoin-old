@@ -1,6 +1,6 @@
 AdCoin version 0.14.2 is now available from:
 
-  <https://download.adcoin.org/adcoin-0.14.2.0/>
+  <https://www.getadcoin.com/wallet/>
 
 This is a new major version release, including new features, various bugfixes
 and performance improvements, as well as updated translations.
@@ -53,7 +53,6 @@ Testnet3 has been deprecated and replaced with Testnet4. The server port has bee
 the same (19332).
 
 Testnet faucets can be located at:
-- http://testnet.adcointools.com
 - http://testnet.thrasher.io
 
 Developers who require the new testnet blockchain paramaters can find them [here](https://github.com/adcoin-project/adcoin/blob/master/src/chainparams.cpp#L220).

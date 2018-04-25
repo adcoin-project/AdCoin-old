@@ -15,9 +15,9 @@ out collectively by the network. AdCoin is the name of open source
 software which enables the use of this currency.
 
 Summary of AdCoin:
-  - 100000000 million total coins
+   - 1000000000 total coins
    - 25 coins per block
-   - Premine amount	70000000 coins (why? [https://www.getadcoin.com](https://www.getadcoin.com))
+   - Premine amount	700000000 coins (why? [https://www.getadcoin.com](https://www.getadcoin.com))
  + - Coin abbreviation	ACC
   
   For more information, as well as an immediately useable, binary version of
